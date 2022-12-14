@@ -16,7 +16,7 @@ output_path = arguments.output
 def medal(country, year):
     result = ''
     count = 0
-    medals = [0, 0, 0] #gold - silver - bronze
+    medals = [0, 0, 0] #g - s - b
     with open(path, 'r') as input_file:
         line = input_file.readline()
         while line and count != 10:
@@ -47,35 +47,20 @@ def total(year):
     result = {}
     with open(path, 'r') as input_file:
         line = input_file.readline()
-        while line:
+        while True:
             line = input_file.readline().split('\t')
+            if len(line) == 1:
+                break
             if line[14] != 'NA\n' and line[9] == year:
-                if result[line[6]] is None:
+                if line[6] not in result.keys():
                     result[line[6]] = [0, 0, 0] #g - s - b
-                    if line[14] == 'Gold\n':
-                        result[line[6]][0] +=1
-                    elif line[14] == 'Silver\n':
-                        result[line[6]][1] +=1
-                    elif line[14] == 'Bronze\n':
-                        result[line[6]][2] +=1
-                else:
-                    if line[14] == 'Gold\n':
-                        result[line[6]][0] +=1
-                    elif line[14] == 'Silver\n':
-                        result[line[6]][1] +=1
-                    elif line[14] == 'Bronze\n':
-                        result[line[6]][2] +=1
-
+                if line[14] == 'Gold\n':
+                    result[line[6]][0] +=1
+                elif line[14] == 'Silver\n':
+                    result[line[6]][1] +=1
+                elif line[14] == 'Bronze\n':
+                    result[line[6]][2] +=1
     return result
-
-#country 6 - gold - silver - bronze    year9
-
-# 1 - name
-# 6 - country
-# 7 - country code
-# 9 - year
-# 13 - game
-# 14 - medal
 
 if arguments.medals:
     medal_result = medal(arguments.medals[0], arguments.medals[1])
@@ -86,4 +71,7 @@ if arguments.medals:
 
 if arguments.total:
     total_result = total(arguments.total)
-    print(total_result)
+
+    if output_path:
+        with open(output_path, 'w') as output_file:
+            output_file.write(str(total_result))
