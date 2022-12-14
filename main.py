@@ -71,7 +71,10 @@ if arguments.medals:
 
 if arguments.total:
     total_result = total(arguments.total)
-
+    result = ''
+    for key in total_result:
+        result += '\n' + str(key) + ': Gold - ' + str(total_result[key][0]) + ', Silver - ' + str(total_result[key][1]) + ', Bronze - ' + str(total_result[key][2])
+        print(result)
     if output_path:
         with open(output_path, 'w') as output_file:
-            output_file.write(str(total_result))
+            output_file.write(result)
