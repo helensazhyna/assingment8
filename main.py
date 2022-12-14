@@ -3,24 +3,15 @@ import argparse
 parser = argparse.ArgumentParser()
 
 parser.add_argument('source', help='File choosing')
-parser.add_argument('-m', '-medals', help='Medals. Usage: -m country/country_code year', nargs=2)
-parser.add_argument('-o', '-output', help='Output in file. Usage: -o filename.txt')
-parser.add_argument('-t', '-total', help='Total statistics. Usage: -t year')
+parser.add_argument('-medals', help='Medals. Usage: -m country/country_code year', nargs=2)
+parser.add_argument('-output', help='Output in file. Usage: -o filename.txt')
+parser.add_argument('-total', help='Total statistics. Usage: -t year')
 
 arguments = parser.parse_args()
 #print(arguments)
 
 path = arguments.source
-output_path = arguments.o
-
-
-
-# 1 - name
-# 6 - country
-# 7 - country code
-# 9 - year
-# 13 - game
-# 14 - medal
+output_path = arguments.output
 
 def medal(country, year):
     result = ''
@@ -52,9 +43,47 @@ def medal(country, year):
         return 'Not enough medals'
     return result
 
-if len(arguments.m) == 2:
-    medal_result = medal(arguments.m[0], arguments.m[1])
+def total(year):
+    result = {}
+    with open(path, 'r') as input_file:
+        line = input_file.readline()
+        while line:
+            line = input_file.readline().split('\t')
+            if line[14] != 'NA\n' and line[9] == year:
+                if result[line[6]] is None:
+                    result[line[6]] = [0, 0, 0] #g - s - b
+                    if line[14] == 'Gold\n':
+                        result[line[6]][0] +=1
+                    elif line[14] == 'Silver\n':
+                        result[line[6]][1] +=1
+                    elif line[14] == 'Bronze\n':
+                        result[line[6]][2] +=1
+                else:
+                    if line[14] == 'Gold\n':
+                        result[line[6]][0] +=1
+                    elif line[14] == 'Silver\n':
+                        result[line[6]][1] +=1
+                    elif line[14] == 'Bronze\n':
+                        result[line[6]][2] +=1
+
+    return result
+
+#country 6 - gold - silver - bronze    year9
+
+# 1 - name
+# 6 - country
+# 7 - country code
+# 9 - year
+# 13 - game
+# 14 - medal
+
+if arguments.medals:
+    medal_result = medal(arguments.medals[0], arguments.medals[1])
     print(medal_result)
     if output_path:
         with open(output_path, 'w') as output_file:
             output_file.write(medal_result)
+
+if arguments.total:
+    total_result = total(arguments.total)
+    print(total_result)
