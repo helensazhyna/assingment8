@@ -8,15 +8,16 @@ parser.add_argument('-output', help='Output in file. Usage: -o filename.txt')
 parser.add_argument('-total', help='Total statistics. Usage: -t year')
 
 arguments = parser.parse_args()
-#print(arguments)
+# print(arguments)
 
 path = arguments.source
 output_path = arguments.output
 
+
 def medal(country, year):
     result = ''
     count = 0
-    medals = [0, 0, 0] #g - s - b
+    medals = [0, 0, 0]  # g - s - b
     with open(path, 'r') as input_file:
         line = input_file.readline()
         while line and count != 10:
@@ -43,6 +44,7 @@ def medal(country, year):
         return 'Not enough medals'
     return result
 
+
 def total(year):
     result = {}
     with open(path, 'r') as input_file:
@@ -53,14 +55,15 @@ def total(year):
                 break
             if line[14] != 'NA\n' and line[9] == year:
                 if line[6] not in result.keys():
-                    result[line[6]] = [0, 0, 0] #g - s - b
+                    result[line[6]] = [0, 0, 0]  # g - s - b
                 if line[14] == 'Gold\n':
-                    result[line[6]][0] +=1
+                    result[line[6]][0] += 1
                 elif line[14] == 'Silver\n':
-                    result[line[6]][1] +=1
+                    result[line[6]][1] += 1
                 elif line[14] == 'Bronze\n':
-                    result[line[6]][2] +=1
+                    result[line[6]][2] += 1
     return result
+
 
 if arguments.medals:
     medal_result = medal(arguments.medals[0], arguments.medals[1])
@@ -73,7 +76,8 @@ if arguments.total:
     total_result = total(arguments.total)
     result = ''
     for key in total_result:
-        result += '\n' + str(key) + ': Gold - ' + str(total_result[key][0]) + ', Silver - ' + str(total_result[key][1]) + ', Bronze - ' + str(total_result[key][2])
+        result += '\n' + str(key) + ': Gold - ' + str(total_result[key][0]) + ', Silver - ' + str(
+            total_result[key][1]) + ', Bronze - ' + str(total_result[key][2])
         print(result)
     if output_path:
         with open(output_path, 'w') as output_file:
@@ -82,14 +86,29 @@ if arguments.total:
 
 def overall(countries):
     result_overall = ''
+    count = 0
     with open(path, 'r') as input_file:
         line = input_file.readline()
         line = line.split('\t')
         if line == line[6]:
-            if line[14] == 'Gold' or 'Silver' or 'Bronze':
-                result_overall += 1
+            if line[14] != 'NA' and line[9] == 'year':
+                count += 1
+                count = int(count)
+                for count in line[9]:
+                    if count > 1:
+                        result_overall == count
+                        return result_overall
 
 
+def interactive(statistics, greatest_olympics, lost):
+    country = input("Please enter name or code of the country: ")
+    with open(path, 'r') as input_file:
+        line = input_file.readline()
+        line = line.split('\t')
+    #statistics
+        for country in line[8]:
+            if country in line[8]:
+                return line[9] and line[11]
 
 
 
