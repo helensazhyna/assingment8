@@ -78,3 +78,18 @@ if arguments.total:
     if output_path:
         with open(output_path, 'w') as output_file:
             output_file.write(result)
+
+
+def overall(countries):
+    result_overall = ''
+    with open(path, 'r') as input_file:
+        line = input_file.readline()
+        line = line.split('\t')
+        if line == line[6]:
+            if line[14] == 'Gold' or 'Silver' or 'Bronze':
+                result_overall += 1
+
+
+
+
+
