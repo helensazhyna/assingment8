@@ -6,6 +6,7 @@ parser.add_argument('source', help='File choosing')
 parser.add_argument('-medals', help='Medals. Usage: -m country/country_code year', nargs=2)
 parser.add_argument('-output', help='Output in file. Usage: -o filename.txt')
 parser.add_argument('-total', help='Total statistics. Usage: -t year')
+parser.add_argument('-overall', help='Overall max medals. Usage: -m country')
 
 arguments = parser.parse_args()
 # print(arguments)
@@ -85,30 +86,43 @@ if arguments.total:
 
 
 def overall(countries):
-    result_overall = ''
-    count = 0
     with open(path, 'r') as input_file:
-        line = input_file.readline()
-        line = line.split('\t')
-        if line == line[6]:
-            if line[14] != 'NA' and line[9] == 'year':
-                count += 1
-                count = int(count)
-                for count in line[9]:
-                    if count > 1:
-                        result_overall == count
-                        return result_overall
+        input_file.readline()
+        index = 0
+        current_year = 0
+        current_medals = 0
+        medal_list = []
+        year_list = []
+        res = []
+        while index <= len(countries):
+            while True:
+                if "" == split_line:
+                    break
+                split_line = input_file.readline().split('\t')
+                if countries[index] == split_line[6] and current_year == 0:
+                    current_year = split_line[9]
+                    if split_line[14] != 'NA\n':
+                        current_medals += 1
+                    else:
+                        continue
+                elif countries[index] == split_line[6] and split_line[9] == current_year:
+                    if split_line[14] != 'NA\n':
+                        current_medals += 1
+        year_list.append(current_year)
+        medal_list.append(current_medals)
+        current_year = 0
+        current_medals = 0
+        max_medal_value = max(medal_list)
+        max_medal_index = medal_list.index(max_medal_value)
+        max_medal_year = year_list[max_medal_index]
+        res.append(max_medal_year + ' ' + max_medal_value)
+        index += 1
+    return res
 
-
-def interactive(statistics, greatest_olympics, lost):
-    country = input("Please enter name or code of the country: ")
-    with open(path, 'r') as input_file:
-        line = input_file.readline()
-        line = line.split('\t')
-    #statistics
-        for country in line[8]:
-            if country in line[8]:
-                return line[9] and line[11]
+ #result += [int(x) for x in split_line[9:14]]
+ #if not line:
+ #print('No such country')
+ #break
 
 
 
