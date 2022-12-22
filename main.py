@@ -7,11 +7,12 @@ parser.add_argument('-medals', help='Medals. Usage: -m country/country_code year
 parser.add_argument('-output', help='Output in file. Usage: -o filename.txt')
 parser.add_argument('-total', help='Total statistics. Usage: -t year')
 parser.add_argument('-overall', help='Overall max medals. Usage: -m country', nargs='*')
-
+parser.add_argument('-interactive')  # help='Statistics of the country. Usage: -m country')
 arguments = parser.parse_args()
 # print(arguments)
 
 path = arguments.source
+
 output_path = arguments.output
 
 
@@ -85,6 +86,7 @@ if arguments.total:
             output_file.write(result)
 
 
+# task 3
 def overall(country):
     res = {}
     with open(path, "r") as input_file:
@@ -131,13 +133,46 @@ def check(country):
         return min_year, city
 
 
+# task 4
+def interactive(country):
+    with open(path, "r") as input_file:
+        line = input_file.readline()
+        while line != "":
+            next_line = line.split("\t")
+            if country == next_line[6] or country == next_line[7]:
+                minimal_year, place = check(country)
+                year_max, maximum = max(overall(country))
+                year_min, minimum = min(overall(country))
+                print(f"First attendance in {minimal_year} in {place}.")
+                print(f"The most successful olympiad in {year_max} had {maximum} medals.")
+                print(f"The worst olympiad in {year_min} had {minimum} medals.")
+                exit()
+                line = input_file.readline()
+
+
+if arguments.medals:
+    medal_result = medal(arguments.medals[0], arguments.medals[1])
+    print(medal_result)
+    if output_path:
+        with open(output_path, 'w') as output_file:
+            output_file.write(medal_result)
+
+if arguments.total:
+    total_result = total(arguments.total)
+    result = ''
+    for key in total_result:
+        result += '\n' + str(key) + ': Gold - ' + str(total_result[key][0]) + ', Silver - ' + str(
+            total_result[key][1]) + ', Bronze - ' + str(total_result[key][2])
+        print(result)
+    if output_path:
+        with open(output_path, 'w') as output_file:
+            output_file.write(result)
+
 if arguments.overall:
     for country in arguments.overall:
         best_year, win_medals = max(overall(country))
         print(f"For {country} in {best_year} the biggest amount of medals is {win_medals}")
 
-
-# result += [int(x) for x in split_line[9:14]]
-# if not line:
-# print('No such country')
-# break
+if arguments.interactive:
+    country = input("Enter the country for statistics: ")
+    print(interactive(country))
