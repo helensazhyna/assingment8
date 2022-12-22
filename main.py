@@ -6,7 +6,7 @@ parser.add_argument('source', help='File choosing')
 parser.add_argument('-medals', help='Medals. Usage: -m country/country_code year', nargs=2)
 parser.add_argument('-output', help='Output in file. Usage: -o filename.txt')
 parser.add_argument('-total', help='Total statistics. Usage: -t year')
-parser.add_argument('-overall', help='Overall max medals. Usage: -m country')
+parser.add_argument('-overall', help='Overall max medals. Usage: -m country', nargs='*')
 
 arguments = parser.parse_args()
 # print(arguments)
@@ -85,44 +85,59 @@ if arguments.total:
             output_file.write(result)
 
 
-def overall(countries):
-    with open(path, 'r') as input_file:
-        input_file.readline()
-        index = 0
-        current_year = 0
-        current_medals = 0
-        medal_list = []
-        year_list = []
-        res = []
-        while index <= len(countries):
-            while True:
-                if "" == split_line:
-                    break
-                split_line = input_file.readline().split('\t')
-                if countries[index] == split_line[6] and current_year == 0:
-                    current_year = split_line[9]
-                    if split_line[14] != 'NA\n':
-                        current_medals += 1
-                    else:
-                        continue
-                elif countries[index] == split_line[6] and split_line[9] == current_year:
-                    if split_line[14] != 'NA\n':
-                        current_medals += 1
-        year_list.append(current_year)
-        medal_list.append(current_medals)
-        current_year = 0
-        current_medals = 0
-        max_medal_value = max(medal_list)
-        max_medal_index = medal_list.index(max_medal_value)
-        max_medal_year = year_list[max_medal_index]
-        res.append(max_medal_year + ' ' + max_medal_value)
-        index += 1
-    return res
+def overall(country):
+    res = {}
+    with open(path, "r") as input_file:
+        line = input_file.readline()
+        while line:
+            next_line = line.split("\t")
+            if country == next_line[6] or country == next_line[7]:
+                if next_line[-1] != "NA\n" and next_line[9] not in res:
+                    res[next_line[9]] = 1
+                elif next_line[-1] != "NA\n":
+                    res[next_line[9]] += 1
+            line = input_file.readline()
 
- #result += [int(x) for x in split_line[9:14]]
- #if not line:
- #print('No such country')
- #break
+    return res.items()
 
 
+def count_medals(medals):
+    gold = 0
+    silver = 0
+    bronze = 0
+    for medal in medals:
+        if "Gold\n" in medal:
+            gold += 1
+        if "Silver\n" in medal:
+            silver += 1
+        if "Bronze\n" in medal:
+            bronze += 1
+    print(f"amount of gold medals {gold}\namount of silver medals {silver}\namount of bronze medals {bronze} ")
+    return gold + silver + bronze
 
+
+def check(country):
+    min_year = 2220
+    with open(path, "r") as input_file:
+        line = input_file.readline()
+        while line != "":
+            new_line = line.split("\t")
+            if country == new_line[6] or country == new_line[7]:
+                year = int(new_line[9])
+                if year < min_year:
+                    min_year = year
+                    city = new_line[11]
+            line = input_file.readline()
+        return min_year, city
+
+
+if arguments.overall:
+    for country in arguments.overall:
+        best_year, win_medals = max(overall(country))
+        print(f"For {country} in {best_year} the biggest amount of medals is {win_medals}")
+
+
+# result += [int(x) for x in split_line[9:14]]
+# if not line:
+# print('No such country')
+# break
